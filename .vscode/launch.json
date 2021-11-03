@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/os",      // change here
             "args": [
-                "os_3",      //  change here
+                "os_0",      //  change here
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

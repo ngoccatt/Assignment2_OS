@@ -5,7 +5,7 @@
             "label": "mytask",      //
             "command": "make",      //
             "args": [
-                "os",      //        change here
+                "all",      //        change here
             ],
             "options": {
                 "cwd": "${fileDirname}"

@@ -115,7 +115,9 @@ static void read_config(const char * path) {
 		ld_processes.path[i][0] = '\0';
 		strcat(ld_processes.path[i], "input/proc/");
 		char proc[100];
-		fscanf(file, "%lu %s\n", &ld_processes.start_time[i], proc);
+		/*int res = */fscanf(file, "%lu %s\n", &ld_processes.start_time[i], proc);
+		// printf("return value is %d\n", res);
+		//neu fscanf da doc het file, nhung minh van goi no, no se tra ve -1, nhung van doc dong du lieu cuoi cung vao proc
 		strcat(ld_processes.path[i], proc);
 	}
 }
