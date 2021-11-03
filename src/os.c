@@ -154,6 +154,7 @@ int main(int argc, char * argv[]) {
 	for (i = 0; i < num_cpus; i++) {
 		pthread_create(&cpu[i], NULL,
 			cpu_routine, (void*)&args[i]);
+		//pthread_join(cpu[i], NULL);
 	}
 
 	/* Wait for CPU and loader finishing */

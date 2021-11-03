@@ -8,9 +8,9 @@
             "name": "test_sched",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/mem",      //
+            "program": "${workspaceFolder}/os",      // change here
             "args": [
-                "input/proc/m0",      //
+                "os_3",      //  change here
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

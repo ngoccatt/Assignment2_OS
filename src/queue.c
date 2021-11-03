@@ -41,7 +41,7 @@ void max_heap_reheap_down(struct queue_t * q, int index) {
         else { //lc != -1 && rc != -1
             maxChild = (q->proc[lc]->priority >= q->proc[rc]->priority) ? lc : rc;
         }
-        if (q->proc[maxChild]->priority > q->proc[index]->priority) {
+        if (q->proc[maxChild]->priority >= q->proc[index]->priority) {
 			//swap
            	temp = q->proc[index];
 			q->proc[index] = q->proc[maxChild];
