@@ -18,6 +18,11 @@ static int timer_started = 0;
 static int timer_stop = 0;
 
 
+//tao ra them 1 cai condition lock nua
+pthread_cond_t broadcast_cond;
+pthread_mutex_t broadcast_lock;
+
+
 static void * timer_routine(void * args) {
 	while (!timer_stop) {
 		printf("Time slot %3lu\n", current_time());
@@ -44,26 +49,42 @@ static void * timer_routine(void * args) {
 		/* Increase the time slot */ //this will run only if something signal it.
 		_time++;
 		
-		/* Let devices continue their job */
+		/* Let devices continue their job */			//unlock timer_cond in next_slot function.
 		for (temp = dev_list; temp != NULL; temp = temp->next) {
 			pthread_mutex_lock(&temp->id.timer_lock);
 			temp->id.done = 0;
 			pthread_cond_signal(&temp->id.timer_cond);
 			pthread_mutex_unlock(&temp->id.timer_lock);
 		}
+
+
+		//sau khi da mo khoa het tat ca timer_cond o cac thread xong roi (vong for chay rat ton thoi gian)
+		//thi minh moi mo khoa broadcast_cond, su dung pthread_cond_broadcast de gui tin hieu toi nhieu thread cung 1 luc
+		pthread_mutex_lock(&broadcast_lock);
+		pthread_cond_broadcast(&broadcast_cond);
+		pthread_mutex_unlock(&broadcast_lock);
+
 		if (fsh == event) {
 			break;
 		}
 	}
+
+	
+
 	pthread_exit(args);
 }
 
 void next_slot(struct timer_id_t * timer_id) {
-	/* Tell to timer that we have done our job in current slot */
+	/* Tell to timer that we have done our job in current slot */		//unlock event_lock in timer_rountine function
 	pthread_mutex_lock(&timer_id->event_lock);
 	timer_id->done = 1;
 	pthread_cond_signal(&timer_id->event_cond);
 	pthread_mutex_unlock(&timer_id->event_lock);
+
+	pthread_mutex_lock(&broadcast_lock);
+	pthread_cond_wait(&broadcast_cond, &broadcast_lock);
+	for(int i = 0; i < 10; i++);
+	pthread_mutex_unlock(&broadcast_lock);
 
 	/* Wait for going to next slot */
 	pthread_mutex_lock(&timer_id->timer_lock);
@@ -83,6 +104,7 @@ uint64_t current_time() {
 void start_timer() {
 	timer_started = 1;
 	pthread_create(&_timer, NULL, timer_routine, NULL);
+	pthread_cond_init(&broadcast_cond, NULL);
 }
 
 void detach_event(struct timer_id_t * event) {

@@ -25,6 +25,7 @@ struct cpu_args {
 	int id;
 };
 
+
 static void * cpu_routine(void * args) {
 	struct timer_id_t * timer_id = ((struct cpu_args*)args)->timer_id;
 	int id = ((struct cpu_args*)args)->id;
