@@ -25,7 +25,24 @@ pthread_mutex_t broadcast_lock;
 
 static void * timer_routine(void * args) {
 	while (!timer_stop) {
+
+
+
 		printf("Time slot %3lu\n", current_time());
+
+		//sau khi da mo khoa het tat ca timer_cond o cac thread xong roi (vong for chay rat ton thoi gian)
+		//roi quay nguoc tro lai dau vong while, in ra time slot thi moi moa khoa broad_cast!
+		//thi minh moi mo khoa broadcast_cond, su dung pthread_cond_broadcast de gui tin hieu toi nhieu thread cung 1 luc
+
+		//Co the an tam su dung broadcast ngay tu dau. vi timer_routine duoc khoi chay dau tien, no goi broadcast, nhung vi luc
+		//nay khong co thread nao wait ca, nen no se bo qua va chay tiep. Ko gap van de gi!
+
+		pthread_mutex_lock(&broadcast_lock);
+		pthread_cond_broadcast(&broadcast_cond);
+		pthread_mutex_unlock(&broadcast_lock);
+
+
+		
 		int fsh = 0;
 		int event = 0;
 		/* Wait for all devices have done the job in current
@@ -58,11 +75,8 @@ static void * timer_routine(void * args) {
 		}
 
 
-		//sau khi da mo khoa het tat ca timer_cond o cac thread xong roi (vong for chay rat ton thoi gian)
-		//thi minh moi mo khoa broadcast_cond, su dung pthread_cond_broadcast de gui tin hieu toi nhieu thread cung 1 luc
-		pthread_mutex_lock(&broadcast_lock);
-		pthread_cond_broadcast(&broadcast_cond);
-		pthread_mutex_unlock(&broadcast_lock);
+		
+		
 
 		if (fsh == event) {
 			break;
@@ -83,7 +97,7 @@ void next_slot(struct timer_id_t * timer_id) {
 
 	pthread_mutex_lock(&broadcast_lock);
 	pthread_cond_wait(&broadcast_cond, &broadcast_lock);
-	for(int i = 0; i < 10; i++);
+	for(int i = 0; i < 100; i++);
 	pthread_mutex_unlock(&broadcast_lock);
 
 	/* Wait for going to next slot */
